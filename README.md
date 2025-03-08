@@ -36,7 +36,7 @@ The link in the resume url column directs me to the uploaded pdf.
 
 # Add new
 This page is used to add new job applications. I used retool's file upload tool for the resume. 
-insert into
+>insert into
   job_search_02 (
     company_name,
     field,
