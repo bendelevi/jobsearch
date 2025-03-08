@@ -36,6 +36,7 @@ The link in the resume url column directs me to the uploaded pdf.
 
 # Add new
 This page is used to add new job applications. I used retool's file upload tool for the resume. 
+https://github.com/bendelevi/jobsearch/blob/4ff0c33d816f92344cca5badb41902a94d1c6455/add_new_app
 
 <img width="1455" alt="image" src="https://github.com/user-attachments/assets/06449c7f-f71c-40ea-b78d-3ac1da21d9f3" />
 
