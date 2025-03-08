@@ -6,6 +6,14 @@ I decided to build an app using retool to keep track of my applications.
 I used the retool database which leverages a PostgreSQL DB.
 I also used some of the new features like the OpenAI integration to enhance the product.
 
+# The database
+I used retool's built-in Postgres DB. I uploaded the schemas in the directory.
+The Tables are as follows:
+>job_search: id (pk), company_name, field, position, salary_low, salary_high, date_applied, resume_version, link, favourite, resume_url
+>interactions: id (pk), application_id (FK), thoughts, date, interaction_number, type (enum), status (enum)
+>cover_letters: id (pk), application_id (FK), letter
+>questions: id (pk), application_id (FK), question, answer
+
 # The dashboard
 The dashboard displays all the metrics on my past applications.
 The pie bar chart on the top right indicates the daily interactions. Yellows are pending applications, greens are the interviews and the reds are the rejections.
