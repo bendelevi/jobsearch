@@ -36,7 +36,7 @@ The link in the resume url column directs me to the uploaded pdf.
 
 # Add new
 This page is used to add new job applications. I used retool's file upload tool for the resume. 
->insert into
+'''insert into
   job_search_02 (
     company_name,
     field,
@@ -65,7 +65,7 @@ values
     {{ fileInput2.value[0]?.name }},
     {{ date1.value }},
     {{ upload_resume.data.url }}
-  )
+  )'''
 <img width="1455" alt="image" src="https://github.com/user-attachments/assets/06449c7f-f71c-40ea-b78d-3ac1da21d9f3" />
 
 
