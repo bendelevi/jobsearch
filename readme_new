@@ -1,0 +1,122 @@
+# JobSearch
+A Retool app to track job applications, generate resumes, and predict application success.
+
+## Overview
+When I started applying for jobs, I realized I was reapplying to the same positions or forgetting my responses to application questions by the time of the interview. To solve this, I built an app using Retool to manage and track my job applications. This app leverages a PostgreSQL database and incorporates OpenAI integration to enhance the product.
+
+## Database Structure
+I utilized Retool's built-in PostgreSQL database. The database schema includes the following tables:
+
+```
+job_search: id (PK), company_name, field, position, salary_low, salary_high, date_applied, resume_version, link, favourite, resume_url
+interactions: id (PK), application_id (FK), thoughts, date, interaction_number, type (enum), status (enum)
+cover_letters: id (PK), application_id (FK), letter
+questions: id (PK), application_id (FK), question, answer
+```
+
+## Dashboard
+The dashboard provides an overview of past applications through various metrics:
+- A **pie bar chart** on the top right shows daily interactions: yellow for pending applications, green for interviews, and red for rejections.
+- A **Sankey chart** on the bottom left visualizes the flow of each application.
+- A **pie chart** represents the distribution of applications across industries.
+
+![Dashboard Metrics](https://github.com/user-attachments/assets/083715b0-05e8-4cb6-b02c-c16fd7f0f8f0)
+
+At the bottom of the dashboard, a table displays favorite applications, filtering out pending applications and those with scheduled interviews. Color coding indicates the number of days since the application:
+- **Green**: Less than 14 days
+- **Yellow**: 15-30 days
+- **Red**: Over 30 days
+
+Future updates will introduce interview probability-based color coding.
+
+![Favorites Table](https://github.com/user-attachments/assets/86017cbd-3575-48a8-95fb-878d3314b83b)
+
+## Logging Applications
+The log page records all application details and allows flagging applications as favorites. The **interaction status** column displays the final outcome. The **resume URL** column links to the uploaded PDF.
+
+![Application Log](https://github.com/user-attachments/assets/4b03743a-800e-4fd1-bc96-6d204e827c36)
+
+## Adding New Applications
+The "Add New" page enables users to input new job applications. Retool's file storage tool is used for resume uploads.
+
+![Add New Page](https://github.com/user-attachments/assets/b411fab4-ac17-48e4-bd0d-9da1be3d6501)
+
+SQL query used for insertion:
+```
+INSERT INTO job_search_02 (company_name, field, position, link, salary_low, salary_high, resume_version, date_applied, resume_url)
+VALUES
+( {{ textInput1.value }}, {{ select3.value }}, {{ textInput2.value }}, {{ textInput3.value }},
+CASE WHEN {{ currency1.value }} = 0 THEN NULL ELSE {{ currency1.value }} END,
+CASE WHEN {{ currency2.value }} = 0 THEN NULL ELSE {{ currency2.value }} END,
+{{ fileInput2.value[0]?.name }}, {{ date1.value }}, {{ upload_resume.data.url }} )
+```
+
+## Tracking Interactions
+Each interaction with an employer is logged, starting with `interaction_number = 0` upon application submission. Further interactions, such as recruiter calls or interview updates, receive incrementing interaction numbers.
+
+![Interaction Tracking](https://github.com/user-attachments/assets/86e22787-04db-4191-b01b-67f0be3f3a86)
+
+Users can:
+1. **View historical applications** using dropdown filters and a calendar view (Monthly, Weekly, Daily, or List view).
+2. **Log new interactions**, specifying the date, type, and latest status.
+
+## Managing Interview Questions
+Many job applications include behavioral questions. Since employers often ask similar questions, I integrated OpenAI to generate responses based on previous answers.
+
+- Retool's **built-in ChatGPT** resource (free but limited)
+- **OpenAI API integration** (more capable but requires credits)
+
+![Question Management](https://github.com/user-attachments/assets/5f4b32ce-5fdd-4639-a7d4-0db6f48bab96)
+
+Prompt used for AI-generated responses:
+```
+Answer the following job application question: {{textInput6.value}} based on previous questions {{ questions_answers.data.Question }} and answers {{ questions_answers.data.Answer }}.
+Highlight this experience: {{ textInput11.value }}.
+Keep it under 500 characters and sound natural.
+Job description: {{ app_link.data.link[0] }}
+Resume: {{ resume_link.data.resume_url[0] }}
+```
+Users can **view historical questions and answers** and add new ones, either manually or via AI-generated responses.
+
+## Cover Letters
+The cover letter page functions similarly to the "Questions" page. It includes a rich text editor for manually drafting cover letters when job descriptions are unavailable.
+
+![Cover Letter Management](https://github.com/user-attachments/assets/7d49bbe6-90e3-4b1d-b7ef-28e9e8c142c4)
+
+## Probability Estimation
+To estimate interview probability, the system applies supervised regression analysis based on factors such as:
+- Favorite status
+- Salary range comparison
+- Total interactions
+- Position name and industry
+
+Due to dataset limitations (~230 applications), some manual adjustments were required to improve model accuracy.
+
+![Probability Estimation](https://github.com/user-attachments/assets/e5eed79d-456c-4a7f-818e-106d1eaadc36)
+
+### SQL Query for Probability Features
+```
+WITH InteractionHistory AS (
+    SELECT i.application_id, j.company_name, j.field, j.position, j.salary_low, j.salary_high, j.favourite,
+           i.interaction_number, i.status,
+           COUNT(i.id) OVER (PARTITION BY i.application_id) AS total_interactions,
+           MAX(i.interaction_number) OVER (PARTITION BY i.application_id) AS latest_interaction_number,
+           MAX(i.date) OVER (PARTITION BY i.application_id) AS last_interaction_date
+    FROM interactions i
+    JOIN job_search_02 j ON i.application_id = j.id
+)
+SELECT application_id, company_name, field, position, salary_low, salary_high, favourite, total_interactions,
+       latest_interaction_number, last_interaction_date,
+       COUNT(CASE WHEN status IN ('Moving to the next step', 'Waiting for an update') THEN 1 END) AS total_interviews,
+       COUNT(CASE WHEN status = 'No offer' THEN 1 END) AS total_final_rounds,
+       COUNT(CASE WHEN status = 'Rejected' THEN 1 END) AS total_rejections
+FROM InteractionHistory
+GROUP BY application_id, company_name, field, position, salary_low, salary_high, favourite, total_interactions, latest_interaction_number, last_interaction_date;
+```
+
+By integrating AI-driven predictions, this system helps prioritize applications and estimate interview success probability.
+
+---
+
+This Retool app has significantly improved my job search process, allowing me to track applications, manage interview responses, and estimate interview probability efficiently.
+
