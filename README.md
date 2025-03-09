@@ -312,5 +312,3 @@ return output_json
 
 
 
-
-
