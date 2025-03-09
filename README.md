@@ -1,4 +1,4 @@
-# jobsearch
+# The job Search Tool
 A retool app to keep track of my applications, generate resumes and predict my applications' success 
 
 When I started applying for jobs, I realized I was reapplying to the same positions or forgetting my responses to application questions by the time of the interview. To solve this, I built an app using Retool to manage and track my job applications. This app leverages a PostgreSQL database and incorporates OpenAI integration to enhance the product.
