@@ -1,14 +1,9 @@
 # jobsearch
 A retool app to keep track of my applications, generate resumes and predict my applications' success 
 
-I started applying for jobs and realized that I am applying for the same jobs again or I forget the answers I give to the questions in the application during the interview.
-I decided to build an app using retool to keep track of my applications.
-I used the retool database which leverages a PostgreSQL DB.
-I also used some of the new features like the OpenAI integration to enhance the product.
-
+When I started applying for jobs, I realized I was reapplying to the same positions or forgetting my responses to application questions by the time of the interview. To solve this, I built an app using Retool to manage and track my job applications. This app leverages a PostgreSQL database and incorporates OpenAI integration to enhance the product.
 # The database
-I used retool's built-in Postgres DB. I uploaded the schemas in the directory.
-The Tables are as follows:
+I utilized Retool's built-in PostgreSQL database. The database schema includes the following tables:
 ```
 job_search: id (pk), company_name, field, position, salary_low, salary_high, date_applied, resume_version, link, favourite, resume_url
 interactions: id (pk), application_id (FK), thoughts, date, interaction_number, type (enum), status (enum)
@@ -17,7 +12,7 @@ questions: id (pk), application_id (FK), question, answer
 ```
 
 # The dashboard
-The dashboard displays all the metrics on my past applications.
+The dashboard provides an overview of past applications through various metrics:
 The pie bar chart on the top right indicates the daily interactions. Yellows are pending applications, greens are the interviews and the reds are the rejections.
 The sankey chart on the bottom left shows the flow of each application.
 ![E0773EB4-1FC4-4E57-9AC9-C93488A95D6E_1_201_a](https://github.com/user-attachments/assets/083715b0-05e8-4cb6-b02c-c16fd7f0f8f0)
@@ -26,7 +21,7 @@ The pie chart shows the breakdown of the industries I apply in.
 At the bottom of the Dashboard page there is a table that shows the jobs that are marked as favourite in the logging process.
 It filters out the pending ones and the ones I have upcoming interviews with. 
 The 3 color codes indicate the days passed since the application. Green is less than 14 days, yellow is 15-30 days and red is 30+ days.
-The next version will add interview probability to the color coding.
+Future updates will introduce interview probability-based color coding.
 ![5255646A-C548-4128-9BC2-05471038F298_4_5005_c](https://github.com/user-attachments/assets/86017cbd-3575-48a8-95fb-878d3314b83b)
 
 # Log
@@ -309,6 +304,12 @@ output_json = df[['application_id', 'interview_probability', 'offer_probability'
 return output_json
 ```
 ![0BC0AEF3-922A-44DC-BB8B-BD84F2048BBB_1_201_a](https://github.com/user-attachments/assets/e713da74-89d5-4320-9942-2cd7a193029f)
+
+# Job Search Tool - Version 2
+The next version will have the following updates:
+1. If the job description doesn't have pay range, the tool will suggest a range based on similar jobs.
+2. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
+3. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
 
