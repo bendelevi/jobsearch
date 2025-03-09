@@ -309,7 +309,8 @@ return output_json
 The next version will have the following updates:
 1. If the job description doesn't have pay range, the tool will suggest a range based on similar jobs.
 2. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
-3. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
+3. Probability based color coding (rather than time based) on the dashboard page for the favourited applications. "Days passed since the application" will be a feature used in the model.
+4. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
 
