@@ -31,6 +31,28 @@ Interaction status column shows the final status.
 The link in the resume url column directs me to the uploaded pdf.
 ![E9EF3785-3A72-49A8-A890-ABB22FD02F45_1_201_a](https://github.com/user-attachments/assets/4b03743a-800e-4fd1-bc96-6d204e827c36)
 
+I used the code below in a workflow to automatically expire the applications that are 60 days old. The workflow is triggered every day at midnight.
+```
+INSERT INTO interactions (application_id, DATE, interaction_number, status, type)
+SELECT 
+  j.id, 
+  j.date_applied + INTERVAL '60 days',  -- The date the application turned 60 days old
+  1, 
+  'Expired',  
+  '60 day expiry'  
+FROM job_search_02 j
+JOIN interactions i ON i.application_id = j.id
+WHERE j.date_applied <= CURRENT_DATE - INTERVAL '60 days'  -- Applications at least 60 days old
+GROUP BY j.id
+HAVING MAX(i.interaction_number) = 0;
+
+
+
+
+
+
+```
+
 # Add new
 This page is used to add new job applications. I used retool's file storage tool for the resume upload. 
 <img width="1465" alt="image" src="https://github.com/user-attachments/assets/b411fab4-ac17-48e4-bd0d-9da1be3d6501" />
