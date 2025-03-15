@@ -335,4 +335,32 @@ The next version will have the following updates:
 4. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
+# Add new V2.0 with salary predictions
+
+I tried 2 different ways of leveraging the OpenAI integration. When the checkbox next to the salary currency input box is selected, it triggers the OpenAI query and fills the search result for the role's compensation.
+The disadvantage of this integration is inconsistancy. If I check, uncheck then check again, it returns different results. I understand that it's a general OpenAI issue.
+I will open a bug ticket and see if there are ways of getting consistent results in the future.
+1. The retool builtin integration doesn't require any purchase. This integration can also read external web sites such as levels.fyi, glassdoor, ...
+   ![image](https://github.com/user-attachments/assets/5312fd8e-7405-43ff-ab55-ce219adfc7c6)
+2. The OpenAI REST API integration. Unfortunately this version can not read external web sites so I had to change the query to read its existing industry benchmark. Here is the OpenAI query:
+```
+[
+  {
+    "role": "system",
+    "content": "You are an AI salary estimation assistant. Your goal is to estimate salary ranges based on historical salary data, industry benchmarks, and past OpenAI knowledge."
+  },
+  {
+    "role": "user",
+    "content": "Estimate the salary range for a {{ textInput2.value }} position at {{ textInput1.value }} in the {{ select3.value }} field. Use your prior knowledge and industry benchmarks."
+  }
+]
+```
+
+   ![A9D9D8E3-8CE0-4D63-95CE-E4617596CA18_1_201_a](https://github.com/user-attachments/assets/8fb0627e-7842-46b5-bdda-f53c50001ebf)
+
+
+
+
+
+
 
