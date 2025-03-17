@@ -1,3 +1,4 @@
+```
 insert into
   job_search_02 (
     company_name,
@@ -28,3 +29,4 @@ values
     {{ date1.value }},
     {{ upload_resume.data.url }}
   )
+```
