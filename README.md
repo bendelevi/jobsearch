@@ -330,9 +330,10 @@ return output_json
 # Job Search Tool - Version 2
 The next version will have the following updates:
 1. If the job description doesn't have pay range, the tool will suggest a range based on similar jobs. https://github.com/users/bendelevi/projects/3?pane=issue&itemId=102123285&issue=bendelevi%7Cjobsearch%7C1
-2. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
-3. Probability based color coding (rather than time based) on the dashboard page for the favourited applications. "Days passed since the application" will be a feature used in the model.
-4. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
+2. The job applications marked as favourite are shown at the bottom of the dashboard page. When clicked, it will show min and max days passed before an application from the same company was rejected.
+3. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
+4. Probability based color coding (rather than time based) on the dashboard page for the favourited applications. "Days passed since the application" will be a feature used in the model.
+5. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
 # Add new V2.0 with salary predictions
@@ -357,6 +358,40 @@ I will open a bug ticket and see if there are ways of getting consistent results
 ```
 
    ![A9D9D8E3-8CE0-4D63-95CE-E4617596CA18_1_201_a](https://github.com/user-attachments/assets/8fb0627e-7842-46b5-bdda-f53c50001ebf)
+
+# Min Max rejection days for the previous applications for the same company
+
+I used the query below to list the min and max days a company took to reject my application.
+
+```
+SELECT
+  j.company_name,
+  MIN(i.date - j.date_applied) AS Min_Days_to_rejection,
+  MAX(i.date - j.date_applied) AS Max_Days_to_rejection
+FROM
+  job_search_02 j
+  JOIN interactions i ON i.application_id = j.id
+WHERE
+  i.interaction_number = 1
+  AND i.status in ('Rejected', 'Job delisted')
+  AND j.company_name = {{ table4.selectedRow.company_name }}
+GROUP BY
+  j.company_name
+ORDER BY
+  j.company_name
+```
+The following code used as a table action triggers a notification when the action is manually clicked for the job application.
+The title:
+```
+{{ query69.data.company_name[0] || table4.selectedRow.company_name }}
+: 
+```
+The body of the notification:
+```
+ Minimum days to rejection: {{ query69.data.min_days_to_rejection[0] ?? 'N/A'}} || Max days to rejection: {{ query69.data.max_days_to_rejection[0] ?? 'N/A'}}
+```
+![image](https://github.com/user-attachments/assets/f5cd6816-0d31-4622-99d2-5b3984a3e5c1)
+
 
 
 
