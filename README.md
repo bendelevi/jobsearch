@@ -336,7 +336,7 @@ The next version will have the following updates:
 5. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
-# Add new V2.0 with salary predictions
+# 1.Add new V2.0 with salary predictions
 
 I tried 2 different ways of leveraging the OpenAI integration. When the checkbox next to the salary currency input box is selected, it triggers the OpenAI query and fills the search result for the role's compensation.
 The disadvantage of this integration is inconsistancy. If I check, uncheck then check again, it returns different results. I understand that it's a general OpenAI issue.
@@ -359,7 +359,7 @@ I will open a bug ticket and see if there are ways of getting consistent results
 
    ![A9D9D8E3-8CE0-4D63-95CE-E4617596CA18_1_201_a](https://github.com/user-attachments/assets/8fb0627e-7842-46b5-bdda-f53c50001ebf)
 
-# Min Max rejection days for the previous applications for the same company
+# 2.Min Max rejection days for the previous applications for the same company
 
 I used the query below to list the min and max days a company took to reject my application.
 
