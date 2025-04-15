@@ -331,9 +331,10 @@ return output_json
 The next version will have the following updates:
 1. If the job description doesn't have pay range, the tool will suggest a range based on similar jobs. https://github.com/users/bendelevi/projects/3?pane=issue&itemId=102123285&issue=bendelevi%7Cjobsearch%7C1
 2. The job applications marked as favourite are shown at the bottom of the dashboard page. When clicked, it will show min and max days passed before an application from the same company was rejected.
-3. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
-4. Probability based color coding (rather than time based) on the dashboard page for the favourited applications. "Days passed since the application" will be a feature used in the model.
-5. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
+3. When a field is clicked on the pie chart, a notification to appear to show the positive & negative application counts in a notification.
+4. I will add a new feature in the model: Resume <> Job description alignment rating. I will use OpenAI to list the top 10 keywords in the job description. Use them to rate my resume. The challende I am having now is that OpenAI returns different results for the same JD <> Resume comparison at differnt times. It skews my model. Once I have a way doing it consistently, I will add the rating as a new feature in my python code.
+5. Probability based color coding (rather than time based) on the dashboard page for the favourited applications. "Days passed since the application" will be a feature used in the model.
+6. Calendar reminders to follow up with the recruiters using OpenAI generated email templates.
 
 
 # 1.Add new V2.0 with salary predictions
@@ -392,6 +393,45 @@ The body of the notification:
 ```
 ![image](https://github.com/user-attachments/assets/f5cd6816-0d31-4622-99d2-5b3984a3e5c1)
 
+# 3.Pie chart fields to trigger notifications showing positive and negative application counts
+As explained in the title, when a field in the pie chart is clicked a notifications appears showing the 2 counts.
+![image](https://github.com/user-attachments/assets/0277d725-b26c-42c9-b9df-78b90a64a617)
+
+The code that feed the notification data:
+```
+SELECT
+  js.field,
+  COUNT(CASE
+          WHEN i.interaction_number = 1
+           AND i.status NOT IN ('Rejected', 'Job delisted', 'Expired')
+        THEN i.id
+       END) AS positive_count,
+  (
+    SELECT COUNT(*)
+    FROM job_search_02 js2
+    WHERE js2.field = js.field
+  ) - COUNT(CASE
+              WHEN i.interaction_number = 1
+               AND i.status NOT IN ('Rejected', 'Job delisted', 'Expired')
+            THEN i.id
+           END) AS rejected_count
+FROM
+  job_search_02 js
+FULL JOIN interactions i ON js.id = i.application_id
+  WHERE
+      js.field = {{ pieChart2.selectedPoints[0].label }}
+  GROUP BY
+  js.field;
+```
+The JS that fills the notification title and description:
+Title:
+```
+Succes rate in the {{ application_by_field2.data.field[0] }} field:
+```
+Description:
+```
+Positive: {{ application_by_field2.data.positive_count[0] }} ; Negative: {{ application_by_field2.data.rejected_count[0] }}
+```
 
 
 
